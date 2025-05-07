@@ -58,10 +58,15 @@ class DIDContract extends Contract {
     return didJSON;
   }
 
-  async createVC(ctx, payload, issuer) {
-    const vcJwt = await createVerifiableCredentialJwt(payload, issuer);
+  async createVC(ctx, payloadStr, issuerStr) {
+    const payload = JSON.parse(payloadStr);
+    const issuerInput = JSON.parse(issuerStr);
+    issuerInput.signer = ES256KSigner(hexToBytes(issuerInput.privateKey)); // Convert to signer
+
+    const vcJwt = await createVerifiableCredentialJwt(payload, issuerInput);
     return vcJwt;
-  }
+}
+
 
   async verifyVC(ctx, vcJwt) {
     // Prepare the did:web resolver
